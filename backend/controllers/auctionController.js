@@ -1,7 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Auction = require('../models/Auction');
 const Bid = require('../models/Bid');
-const path = require('path');
 
 // @desc    Get all active auctions (with search/filter/sort)
 // @route   GET /api/auctions
@@ -95,9 +94,7 @@ const createAuction = asyncHandler(async (req, res) => {
     throw new Error('End time must be in the future');
   }
 
-  const imageUrl = req.file
-    ? `/uploads/${req.file.filename}`
-    : null;
+  const imageUrl = req.file ? req.file.path : null;
 
   const auction = await Auction.create({
     title,
@@ -148,7 +145,7 @@ const updateAuction = asyncHandler(async (req, res) => {
   if (status && req.user.role === 'admin') auction.status = status;
 
   if (req.file) {
-    auction.image = `/uploads/${req.file.filename}`;
+    auction.image = req.file.path;
   }
 
   const updated = await auction.save();
